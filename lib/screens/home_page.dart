@@ -4,6 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:sm_seans/models/data.dart';
+import 'package:sm_seans/screens/AppointmentsPage.dart';
+import 'package:sm_seans/screens/PaymentsPage.dart';
+import 'package:sm_seans/screens/ProfilePage.dart';
+import 'package:sm_seans/screens/SessionsPage.dart';
+import 'package:sm_seans/screens/logoutPage.dart';
+import 'package:sm_seans/screens/log_in.dart';
+import 'package:sm_seans/services/tokenUserIdservice.dart';
+
 // Ensure this is imported
 
 class HomePage extends StatelessWidget {
@@ -62,7 +71,10 @@ class HomePage extends StatelessWidget {
               leading: Icon(Icons.calendar_today, color: Colors.purple[800]),
               title: Text('Appointments'),
               onTap: () {
-                // Handle navigation to Appointments
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AppointmentsPage()),
+                );
               },
             ),
 
@@ -71,7 +83,10 @@ class HomePage extends StatelessWidget {
               leading: Icon(Icons.access_time, color: Colors.purple[800]),
               title: Text('Sessions'),
               onTap: () {
-                // Handle navigation to Sessions
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SessionsPage()),
+                );
               },
             ),
 
@@ -79,8 +94,24 @@ class HomePage extends StatelessWidget {
             ListTile(
               leading: Icon(Icons.payment, color: Colors.purple[800]),
               title: Text('Payments'),
-              onTap: () {
-                // Handle navigation to Payments
+              onTap: () async {
+                final authService =
+                    AuthService(); // Make sure to initialize the authService here
+                final userId =
+                    await authService.getUserId(); // Get the saved userId
+
+                if (userId != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaymentPage(
+                          userId: userId), // Pass userId to PaymentPage
+                    ),
+                  );
+                } else {
+                  // Handle the case where userId is null (if needed)
+                  print('Error: userId is null');
+                }
               },
             ),
 
@@ -89,7 +120,10 @@ class HomePage extends StatelessWidget {
               leading: Icon(Icons.person, color: Colors.purple[800]),
               title: Text('Profile'),
               onTap: () {
-                // Handle navigation to Profile
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage()),
+                );
               },
             ),
 
@@ -98,7 +132,7 @@ class HomePage extends StatelessWidget {
               leading: Icon(Icons.logout, color: Colors.purple[800]),
               title: Text('Log Out'),
               onTap: () {
-                // Handle log out
+                showLogoutDialog(context);
               },
             ),
           ],

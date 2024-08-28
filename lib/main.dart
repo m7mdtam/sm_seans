@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-import 'screens/splash_screen.dart';
+import 'package:sm_seans/screens/splash_screen.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,6 +22,8 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: SplashScreen(),
+
+      // Let the system handle other routes
     );
   }
 }

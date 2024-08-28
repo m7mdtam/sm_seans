@@ -1,12 +1,14 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, sort_child_properties_last, use_build_context_synchronously
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sm_seans/screens/home_page.dart';
 import 'package:sm_seans/screens/sign_up.dart';
+import 'package:sm_seans/services/tokenUserIdservice.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -20,8 +22,6 @@ class _LogInState extends State<LogIn> {
   String _email = '';
   String _password = '';
   bool _obscureText = true;
-
-  // Create an instance of FlutterSecureStorage
   final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   Future<void> _login() async {
@@ -40,33 +40,40 @@ class _LogInState extends State<LogIn> {
     if (response.statusCode == 200) {
       final responseBody = json.decode(response.body);
       final token = responseBody['token'];
+      final userId = responseBody['id'];
+      final email = responseBody['email'];
 
       if (token != null && token.isNotEmpty) {
-        // Save the token using FlutterSecureStorage
         await _secureStorage.write(key: 'authToken', value: token);
+        await _secureStorage.write(key: 'id', value: userId.toString());
+        await _secureStorage.write(key: 'email', value: email);
+
+        final authService = AuthService();
+        final savedToken = await authService.getAuthToken();
+        final userid = await authService.getUserId();
+        final saveemail = await authService.getUseremail();
         print('Token saved successfully.');
 
-        // Optionally, you can retrieve the token to verify it's saved correctly
-        final savedToken = await _secureStorage.read(key: 'authToken');
         print('Retrieved Token: $savedToken');
+        print('id Token: $userid');
+        print('email Token: $saveemail');
 
-        // Clear the form fields after successful login
+        // Clear the form fields after login
         _formKey.currentState?.reset(); // Reset the form
         setState(() {
           _email = '';
           _password = '';
         });
 
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(
-            'Login successful!',
-            style: TextStyle(color: Colors.green),
-          )),
+            content: Text(
+              'Login successful!',
+              style: TextStyle(color: Colors.green),
+            ),
+          ),
         );
 
-        // Navigate to HomePage
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomePage()),
@@ -75,21 +82,139 @@ class _LogInState extends State<LogIn> {
         print('Login failed: Token is empty.');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(
-            'Login failed: Token is empty.',
-          )),
+            content: Text(
+              'Login failed: Token is empty.',
+            ),
+          ),
         );
       }
     } else {
       print('Login failed. Error: ${response.body}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(
-          'Login failed. Please try again.',
-          style: TextStyle(color: Colors.red),
-        )),
+          content: Text(
+            'Login failed. Please try again.',
+            style: TextStyle(color: Colors.red),
+          ),
+        ),
       );
     }
+  }
+
+  Future<void> _resetPassword() async {
+    final url = Uri.parse(
+        'https://localhost:7005/api/Auth/forgot-password'); // Replace with your actual API URL
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'email': _email,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Password reset email sent!',
+            style: TextStyle(color: Colors.green),
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to send reset email. Please try again.',
+            style: TextStyle(color: Colors.red),
+          ),
+        ),
+      );
+    }
+  }
+
+  void _showResetPasswordDialog() {
+    final _dialogEmailController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Reset Password',
+            style: GoogleFonts.zenDots(
+              textStyle: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.purple[800],
+              ),
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _dialogEmailController,
+                decoration: InputDecoration(
+                  labelText: 'Enter your email',
+                  prefixIcon: Icon(Icons.email),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                keyboardType: TextInputType.emailAddress,
+                onChanged: (value) => _email = value,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (_dialogEmailController.text.isNotEmpty) {
+                  _email = _dialogEmailController.text;
+                  _resetPassword();
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Please enter your email',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  );
+                }
+              },
+              child: Text(
+                'Reset Password',
+                style: TextStyle(
+                  color: Color.fromARGB(255, 142, 80, 198),
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white, // Match button color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -115,28 +240,25 @@ class _LogInState extends State<LogIn> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: 35,
-                    ),
+                    SizedBox(height: 35),
                     Text(
                       'GYMMate',
                       style: GoogleFonts.zenDots(
-                          textStyle: TextStyle(
-                        fontSize: 35.0,
-
-                        fontWeight: FontWeight.bold,
-
-                        color: Colors.purple[800],
-                        shadows: [
-                          Shadow(
-                            blurRadius: 10.0,
-                            color: Colors.black.withOpacity(0.5),
-                            offset: Offset(2.0, 2.0),
-                          ),
-                        ], // Darker purple
-                      )),
+                        textStyle: TextStyle(
+                          fontSize: 35.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.purple[800],
+                          shadows: [
+                            Shadow(
+                              blurRadius: 10.0,
+                              color: Colors.black.withOpacity(0.5),
+                              offset: Offset(2.0, 2.0),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    SizedBox(height: 8), // Space between title and login form
+                    SizedBox(height: 8),
                     Text(
                       'Log In',
                       style: TextStyle(
@@ -164,7 +286,7 @@ class _LogInState extends State<LogIn> {
                         }
                         return null;
                       },
-                      onSaved: (value) => _email = value!,
+                      onChanged: (value) => _email = value,
                     ),
                     SizedBox(height: 20.0),
                     TextFormField(
@@ -190,23 +312,20 @@ class _LogInState extends State<LogIn> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      obscureText:
-                          _obscureText, // Toggle this with the state variable
+                      obscureText: _obscureText,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your password';
                         }
                         return null;
                       },
-                      onSaved: (value) => _password = value!,
+                      onChanged: (value) => _password = value,
                     ),
                     SizedBox(height: 10.0),
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {
-                          // Navigate to forgot password screen
-                        },
+                        onPressed: _showResetPasswordDialog,
                         child: Text(
                           'Forgot your password?',
                           style: TextStyle(color: Colors.purple[800]),
@@ -218,10 +337,7 @@ class _LogInState extends State<LogIn> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
-                          setState(() {
-                            _login();
-                          });
-                          (); // Call the login function
+                          _login();
                         }
                       },
                       child: Text(
@@ -232,7 +348,7 @@ class _LogInState extends State<LogIn> {
                           fontSize: 16,
                         ),
                       ),
-                      style: TextButton.styleFrom(
+                      style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromARGB(255, 142, 80, 198),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
