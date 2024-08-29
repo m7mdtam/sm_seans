@@ -13,134 +13,7 @@ class SignUp extends StatefulWidget {
   State<SignUp> createState() => _SignUpState();
 }
 
-class _SignUpState extends State<SignUp> {
-  final _formKey = GlobalKey<FormState>();
-  final _secureStorage = FlutterSecureStorage();
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-
-  // Define controllers
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-
-  Future<void> _signUp() async {
-    if (_formKey.currentState!.validate()) {
-      final url = Uri.parse(
-          'https://localhost:7005/api/User'); // Replace with your actual API URL
-
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'username': _usernameController.text,
-          'first_name': _firstNameController.text,
-          'last_name': _lastNameController.text,
-          'email': _emailController.text,
-          'phone_number': _phoneNumberController.text,
-          'password': _passwordController.text,
-          'status': "",
-          'role_name': "",
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final responseBody = json.decode(response.body);
-        final token = responseBody['token'];
-
-        if (token != null && token.isNotEmpty) {
-          await _secureStorage.write(key: 'authToken', value: token);
-          print('Token saved successfully.');
-
-          final savedToken = await _secureStorage.read(key: 'authToken');
-          print('Retrieved Token: $savedToken');
-
-          // Navigate to another screen or perform further actions
-        } else {
-          print('Sign-Up failed: Token is empty.');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Sign-Up failed: Token is empty.')),
-          );
-        }
-      } else {
-        print('Sign-Up failed. Error: ${response.body}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sign-Up failed. Please try again.')),
-        );
-      }
-    }
-  }
-
-  Future<void> _signUpWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-
-      if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
-
-        final url = Uri.parse(
-            'https://localhost:7005/api/auth/google'); // Replace with your actual API URL
-
-        final response = await http.post(
-          url,
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode({
-            'idToken': googleAuth.idToken,
-          }),
-        );
-
-        if (response.statusCode == 200) {
-          final responseBody = json.decode(response.body);
-          final token = responseBody['token'];
-
-          if (token != null && token.isNotEmpty) {
-            await _secureStorage.write(key: 'authToken', value: token);
-            print('Token saved successfully.');
-
-            final savedToken = await _secureStorage.read(key: 'authToken');
-            print('Retrieved Token: $savedToken');
-
-            // Navigate to another screen or perform further actions
-          } else {
-            print('Google Sign-In failed: Token is empty.');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Google Sign-In failed: Token is empty.')),
-            );
-          }
-        } else {
-          print('Google Sign-In failed. Error: ${response.body}');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Google Sign-In failed. Please try again.')),
-          );
-        }
-      }
-    } catch (e) {
-      print('Error during Google Sign-In: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Error during Google Sign-In. Please try again.')),
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    // Dispose of controllers when the widget is disposed
-    _usernameController.dispose();
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _emailController.dispose();
-    _phoneNumberController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
+class _SignUpState extends State<SignUp> with SignUpMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,8 +23,8 @@ class _SignUpState extends State<SignUp> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 190, 197, 195), // Light background
-                Color.fromARGB(255, 200, 140, 231), // Light purple
+                Color.fromARGB(255, 190, 197, 195),
+                Color.fromARGB(255, 200, 140, 231),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -181,7 +54,7 @@ class _SignUpState extends State<SignUp> {
                         ],
                       )),
                     ),
-                    SizedBox(height: 4), // Space between title and form
+                    SizedBox(height: 4),
                     Text(
                       'Sign Up',
                       style: TextStyle(
@@ -357,7 +230,7 @@ class _SignUpState extends State<SignUp> {
                     ElevatedButton(
                       onPressed: _signUp,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple[800], // Background color
+                        backgroundColor: Colors.purple[800],
                         padding: EdgeInsets.symmetric(
                             horizontal: 50.0, vertical: 15.0),
                         shape: RoundedRectangleBorder(
@@ -399,7 +272,6 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ],
                     ),
-
                     SizedBox(height: 6.0),
                     ElevatedButton.icon(
                       onPressed: _signUpWithGoogle,
@@ -429,15 +301,13 @@ class _SignUpState extends State<SignUp> {
                     ),
                     SizedBox(height: 6.0),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment
-                          .center, // Center the content horizontally
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           "Already have an account?",
                           style: TextStyle(
                             color: Colors.purple[800],
-                            fontSize:
-                                14.0, // Reduced font size for a more compact appearance
+                            fontSize: 14.0,
                           ),
                         ),
                         TextButton(
@@ -452,24 +322,18 @@ class _SignUpState extends State<SignUp> {
                             style: TextStyle(
                               color: Colors.purple[800],
                               fontWeight: FontWeight.bold,
-                              fontSize:
-                                  14.0, // Reduced font size for consistency
+                              fontSize: 14.0,
                             ),
                           ),
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                                vertical:
-                                    0.0), // Adjusted padding for a tighter fit
-                            minimumSize: Size(
-                                0, 0), // Remove default button size constraints
-                            tapTargetSize: MaterialTapTargetSize
-                                .shrinkWrap, // Reduce the button's hit area
+                                horizontal: 8.0, vertical: 0.0),
+                            minimumSize: Size(0, 0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                         ),
                       ],
                     ),
-
                     SizedBox(height: 10.0),
                   ],
                 ),
@@ -479,5 +343,126 @@ class _SignUpState extends State<SignUp> {
         ),
       ),
     );
+  }
+}
+
+mixin SignUpMixin on State<SignUp> {
+  final _formKey = GlobalKey<FormState>();
+  final _secureStorage = FlutterSecureStorage();
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  Future<void> _signUp() async {
+    if (_formKey.currentState!.validate()) {
+      final url = Uri.parse('https://localhost:7005/api/User');
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'username': _usernameController.text,
+          'first_name': _firstNameController.text,
+          'last_name': _lastNameController.text,
+          'email': _emailController.text,
+          'phone_number': _phoneNumberController.text,
+          'password': _passwordController.text,
+          'status': "",
+          'role_name': "",
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final token = responseBody['token'];
+
+        if (token != null && token.isNotEmpty) {
+          await _secureStorage.write(key: 'authToken', value: token);
+          print('Token saved successfully.');
+
+          final savedToken = await _secureStorage.read(key: 'authToken');
+          print('Retrieved Token: $savedToken');
+        } else {
+          print('Sign-Up failed: Token is empty.');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Sign-Up failed: Token is empty.')),
+          );
+        }
+      } else {
+        print('Sign-Up failed. Error: ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign-Up failed. Please try again.')),
+        );
+      }
+    }
+  }
+
+  Future<void> _signUpWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser != null) {
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+
+        final url = Uri.parse('https://localhost:7005/api/auth/google');
+
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({
+            'idToken': googleAuth.idToken,
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          final responseBody = json.decode(response.body);
+          final token = responseBody['token'];
+
+          if (token != null && token.isNotEmpty) {
+            await _secureStorage.write(key: 'authToken', value: token);
+            print('Token saved successfully.');
+
+            final savedToken = await _secureStorage.read(key: 'authToken');
+            print('Retrieved Token: $savedToken');
+          } else {
+            print('Google Sign-In failed: Token is empty.');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Google Sign-In failed: Token is empty.')),
+            );
+          }
+        } else {
+          print('Google Sign-In failed. Error: ${response.body}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Google Sign-In failed. Please try again.')),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error during Google Sign-In: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Error during Google Sign-In. Please try again.')),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _phoneNumberController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
   }
 }

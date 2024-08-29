@@ -3,42 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:googleapis/calendar/v3.dart' as calendar;
 import 'package:sm_seans/services/CalendarService.dart';
-import 'package:sm_seans/services/auth.dart'; // Import the correct path to your service
+import 'package:sm_seans/services/auth.dart';
 
 class AppointmentsPage extends StatefulWidget {
   @override
   _AppointmentsPageState createState() => _AppointmentsPageState();
 }
 
-class _AppointmentsPageState extends State<AppointmentsPage> {
-  final CalendarService _calendarService = CalendarService();
-  List<calendar.Event> _appointments = [];
-  bool _loading = true;
-  String _errorMessage = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _loadAppointments();
-  }
-
-  Future<void> _loadAppointments() async {
-    try {
-      final appointments = await _calendarService.getEvenets();
-      print('Fetched ${appointments.length} appointments.');
-      setState(() {
-        _appointments = appointments;
-        _loading = false;
-      });
-    } catch (e) {
-      print('Error fetching appointments: $e');
-      setState(() {
-        _loading = false;
-        _errorMessage = 'Failed to load appointments. Please try again later.';
-      });
-    }
-  }
-
+class _AppointmentsPageState extends State<AppointmentsPage>
+    with AppointmentsPageMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,5 +74,35 @@ class _AppointmentsPageState extends State<AppointmentsPage> {
                       },
                     ),
     );
+  }
+}
+
+mixin AppointmentsPageMixin on State<AppointmentsPage> {
+  final CalendarService _calendarService = CalendarService();
+  List<calendar.Event> _appointments = [];
+  bool _loading = true;
+  String _errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAppointments();
+  }
+
+  Future<void> _loadAppointments() async {
+    try {
+      final appointments = await _calendarService.getEvenets();
+      print('Fetched ${appointments.length} appointments.');
+      setState(() {
+        _appointments = appointments;
+        _loading = false;
+      });
+    } catch (e) {
+      print('Error fetching appointments: $e');
+      setState(() {
+        _loading = false;
+        _errorMessage = 'Failed to load appointments. Please try again later.';
+      });
+    }
   }
 }

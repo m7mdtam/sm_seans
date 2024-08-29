@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'log_in.dart'; // Make sure this path is correct
+import 'log_in.dart';
 
 class SplashScreen extends StatelessWidget {
   @override
@@ -11,8 +11,8 @@ class SplashScreen extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 190, 197, 195), // Light background
-                Color.fromARGB(255, 200, 140, 231), // Light purple
+                Color.fromARGB(255, 190, 197, 195),
+                Color.fromARGB(255, 200, 140, 231),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -25,16 +25,13 @@ class SplashScreen extends StatelessWidget {
                 SizedBox(
                   height: 90,
                 ),
-                // Image with rounded borders using ClipRRect
                 ClipRRect(
-                  borderRadius:
-                      BorderRadius.circular(100.0), // Circular borders
+                  borderRadius: BorderRadius.circular(100.0),
                   child: Image.asset(
-                    'lib/images/logom.jpeg', // Make sure you have an image in this path
-                    height: 200, // Adjust size as needed
-                    width: 200, // Adjust size as needed
-                    fit: BoxFit
-                        .cover, // Ensures the image covers the whole space
+                    'lib/images/logom.jpeg',
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 SizedBox(height: 20),
@@ -63,8 +60,7 @@ class SplashScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16.0,
-                      color:
-                          Colors.purple[800]?.withOpacity(0.7), // Light color
+                      color: Colors.purple[800]?.withOpacity(0.7),
                     ),
                   ),
                 ),

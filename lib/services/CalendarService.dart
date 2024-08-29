@@ -1,5 +1,7 @@
+// ignore_for_file: file_names
+
 import 'package:googleapis/calendar/v3.dart' as calendar;
-import 'package:sm_seans/services/auth.dart'; // Ensure this is the correct path to your auth service
+import 'package:sm_seans/services/auth.dart';
 
 class CalendarService {
   Future<List<calendar.Event>> getEvenets() async {
