@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> with HomePageMixin {
       appBar: AppBar(
         title: Text(
           'Home Page',
-          style: TextStyle(color: Colors.white),
+          style: GoogleFonts.montserrat(color: Colors.white),
         ),
         backgroundColor: Colors.purple[800],
         iconTheme: IconThemeData(color: Colors.white),
@@ -45,7 +45,10 @@ class _HomePageState extends State<HomePage> with HomePageMixin {
             Divider(color: Colors.grey),
             ListTile(
               leading: Icon(Icons.home, color: Colors.purple[800]),
-              title: Text('Home'),
+              title: Text(
+                'Home',
+                style: GoogleFonts.montserrat(),
+              ),
               onTap: () {
                 Navigator.pushReplacement(
                   context,
@@ -55,7 +58,10 @@ class _HomePageState extends State<HomePage> with HomePageMixin {
             ),
             ListTile(
               leading: Icon(Icons.calendar_today, color: Colors.purple[800]),
-              title: Text('Appointments'),
+              title: Text(
+                'Appointments',
+                style: GoogleFonts.montserrat(),
+              ),
               onTap: () {
                 Navigator.push(
                   context,
@@ -65,7 +71,10 @@ class _HomePageState extends State<HomePage> with HomePageMixin {
             ),
             ListTile(
               leading: Icon(Icons.access_time, color: Colors.purple[800]),
-              title: Text('Sessions'),
+              title: Text(
+                'Sessions',
+                style: GoogleFonts.montserrat(),
+              ),
               onTap: () {
                 Navigator.push(
                   context,
@@ -75,7 +84,10 @@ class _HomePageState extends State<HomePage> with HomePageMixin {
             ),
             ListTile(
               leading: Icon(Icons.payment, color: Colors.purple[800]),
-              title: Text('Payments'),
+              title: Text(
+                'Payments',
+                style: GoogleFonts.montserrat(),
+              ),
               onTap: () async {
                 final authService = AuthService();
                 final userId = await authService.getUserId();
@@ -93,7 +105,10 @@ class _HomePageState extends State<HomePage> with HomePageMixin {
             ),
             ListTile(
               leading: Icon(Icons.person, color: Colors.purple[800]),
-              title: Text('Profile'),
+              title: Text(
+                'Profile',
+                style: GoogleFonts.montserrat(),
+              ),
               onTap: () {
                 Navigator.push(
                   context,
@@ -103,7 +118,10 @@ class _HomePageState extends State<HomePage> with HomePageMixin {
             ),
             ListTile(
               leading: Icon(Icons.logout, color: Colors.purple[800]),
-              title: Text('Log Out'),
+              title: Text(
+                'Log Out',
+                style: GoogleFonts.montserrat(),
+              ),
               onTap: () {
                 showLogoutDialog(context);
               },
@@ -112,6 +130,8 @@ class _HomePageState extends State<HomePage> with HomePageMixin {
         ),
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -124,74 +144,71 @@ class _HomePageState extends State<HomePage> with HomePageMixin {
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 60.0,
-                  backgroundColor: Colors.white,
-                  child: CircleAvatar(
-                    radius: 55.0,
-                    backgroundColor: Colors.purple[800],
-                    child: Text(
-                      userName[0],
-                      style: TextStyle(
-                        fontSize: 50.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 60.0,
+                backgroundColor: Colors.white,
+                child: CircleAvatar(
+                  radius: 55.0,
+                  backgroundColor: Colors.purple[800],
+                  child: Text(
+                    userName[0],
+                    style: GoogleFonts.montserrat(
+                      fontSize: 50.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                SizedBox(height: 20.0),
-                Text(
-                  userName,
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+              ),
+              SizedBox(height: 20.0),
+              Text(
+                userName,
+                style: GoogleFonts.montserrat(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-                SizedBox(height: 5.0),
-                Text(
-                  userEmail,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w300,
-                    color: Colors.white70,
-                  ),
+              ),
+              SizedBox(height: 5.0),
+              Text(
+                userEmail,
+                style: GoogleFonts.montserrat(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w300,
+                  color: Colors.white70,
                 ),
-                SizedBox(height: 30.0),
-                Text(
-                  'Your QR Code',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+              ),
+              SizedBox(height: 30.0),
+              Text(
+                'Your QR Code',
+                style: GoogleFonts.montserrat(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-                SizedBox(height: 10.0),
-                QrImageView(
-                  data: userQRCode,
-                  version: QrVersions.auto,
-                  size: 270.0,
-                  gapless: false,
-                  errorStateBuilder: (cxt, err) {
-                    return Container(
-                      child: Center(
-                        child: Text(
-                          'Uh oh! Something went wrong...',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white),
-                        ),
+              ),
+              SizedBox(height: 10.0),
+              QrImageView(
+                data: userQRCode,
+                version: QrVersions.auto,
+                size: 270.0,
+                gapless: false,
+                errorStateBuilder: (cxt, err) {
+                  return Container(
+                    child: Center(
+                      child: Text(
+                        'Uh oh! Something went wrong...',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.montserrat(color: Colors.white),
                       ),
-                    );
-                  },
-                ),
-              ],
-            ),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),
@@ -200,7 +217,7 @@ class _HomePageState extends State<HomePage> with HomePageMixin {
 }
 
 mixin HomePageMixin on State<HomePage> {
-  final String userName = "mohammed altamimi"; // Test username
+  final String userName = "Mohammed altamimi"; // Test username
 
   final String userEmail = "mohammedtamimi72@gmail.com"; // Test email
 

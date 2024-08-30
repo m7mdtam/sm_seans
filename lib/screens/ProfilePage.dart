@@ -1,6 +1,8 @@
+// ignore_for_file: prefer_const_constructors, unused_import, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sm_seans/screens/edit_profile_page.dart';
+import 'edit_profile_page.dart'; // Ensure the correct path to your EditProfilePage
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -14,7 +16,7 @@ class _ProfilePageState extends State<ProfilePage> with ProfilePageMixin {
       appBar: AppBar(
         title: Text(
           'Profile',
-          style: TextStyle(color: Colors.white),
+          style: appBarTextStyle,
         ),
         backgroundColor: Colors.purple[800],
         iconTheme: IconThemeData(color: Colors.white),
@@ -41,36 +43,28 @@ class _ProfilePageState extends State<ProfilePage> with ProfilePageMixin {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildProfilePicture(),
-                  SizedBox(height: 12.0),
-                  Text(
-                    '$firstName $lastName',
-                    style: TextStyle(
-                      fontSize: 25.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 8.0),
-                  Text(
-                    email,
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w300,
-                      color: Colors.white70,
-                    ),
-                  ),
-                  SizedBox(height: 30.0),
-                  _buildStatsSection(),
-                  Divider(height: 40.0, color: Colors.white70),
-                  _buildHistorySection(context),
-                ],
-              ),
+            padding: EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildProfilePicture(),
+                SizedBox(height: 5.0),
+                Text(
+                  '$firstName $lastName',
+                  style: nameTextStyle,
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 4.0),
+                Text(
+                  email,
+                  style: emailTextStyle,
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 10.0),
+                _buildStatsSection(),
+                SizedBox(height: 10.0),
+                _buildHistorySection(context),
+              ],
             ),
           ),
         ),
@@ -88,12 +82,76 @@ mixin ProfilePageMixin on State<ProfilePage> {
   int age = 30;
   String selectedHistory = "week";
 
+  // Text Styles
+  final TextStyle appBarTextStyle = GoogleFonts.montserrat(
+    textStyle: TextStyle(
+      color: Colors.white,
+      fontSize: 20.0,
+      fontWeight: FontWeight.w600,
+    ),
+  );
+
+  final TextStyle nameTextStyle = GoogleFonts.montserrat(
+    textStyle: TextStyle(
+      fontSize: 22.0,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+  );
+
+  final TextStyle emailTextStyle = GoogleFonts.montserrat(
+    textStyle: TextStyle(
+      fontSize: 13.0,
+      fontWeight: FontWeight.w400,
+      color: Colors.white70,
+    ),
+  );
+
+  final TextStyle statValueTextStyle = GoogleFonts.montserrat(
+    textStyle: TextStyle(
+      fontSize: 22.0,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+  );
+
+  final TextStyle statLabelTextStyle = GoogleFonts.montserrat(
+    textStyle: TextStyle(
+      fontSize: 14.0,
+      fontWeight: FontWeight.w500,
+      color: Colors.white70,
+    ),
+  );
+
+  final TextStyle sectionTitleTextStyle = GoogleFonts.montserrat(
+    textStyle: TextStyle(
+      fontSize: 22.0,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+  );
+
+  final TextStyle historyButtonTextStyle = GoogleFonts.montserrat(
+    textStyle: TextStyle(
+      fontSize: 16.0,
+      fontWeight: FontWeight.w600,
+    ),
+  );
+
+  final TextStyle historyDetailTextStyle = GoogleFonts.montserrat(
+    textStyle: TextStyle(
+      fontSize: 16.0,
+      fontWeight: FontWeight.w400,
+      color: Colors.white70,
+    ),
+  );
+
   Widget _buildProfilePicture() {
     return CircleAvatar(
       radius: 60.0,
       backgroundColor: Colors.white,
       child: CircleAvatar(
-        radius: 55.0,
+        radius: 56.0,
         backgroundColor: Colors.purple[800],
         child: Icon(
           Icons.person,
@@ -105,46 +163,35 @@ mixin ProfilePageMixin on State<ProfilePage> {
   }
 
   Widget _buildStatsSection() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildStatCard(
-            'Workouts', workoutsCount.toString(), Colors.purple[100]!),
-        VerticalDivider(
-          width: 20.0,
-          color: Colors.white70,
-          thickness: 1.0,
+    return Card(
+      color: Colors.purple[600]?.withOpacity(0.6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      elevation: 5,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildStatCard('Workouts', workoutsCount.toString()),
+            _buildStatCard('Weight', '${weight} kg'),
+            _buildStatCard('Age', age.toString()),
+          ],
         ),
-        _buildStatCard('Weight', '${weight}kg', Colors.purple[100]!),
-        VerticalDivider(
-          width: 20.0,
-          color: Colors.white70,
-          thickness: 1.0,
-        ),
-        _buildStatCard('Age', age.toString(), Colors.purple[100]!),
-      ],
+      ),
     );
   }
 
-  Widget _buildStatCard(String title, String value, Color textColor) {
+  Widget _buildStatCard(String title, String value) {
     return Column(
       children: [
         Text(
           value,
-          style: TextStyle(
-            fontSize: 24.0,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
+          style: statValueTextStyle,
         ),
         SizedBox(height: 4.0),
         Text(
           title,
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.w400,
-            color: textColor.withOpacity(0.8),
-          ),
+          style: statLabelTextStyle,
         ),
       ],
     );
@@ -156,13 +203,9 @@ mixin ProfilePageMixin on State<ProfilePage> {
       children: [
         Text(
           'Workout History',
-          style: TextStyle(
-            fontSize: 22.0,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          style: sectionTitleTextStyle,
         ),
-        SizedBox(height: 20.0),
+        SizedBox(height: 4.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -178,6 +221,7 @@ mixin ProfilePageMixin on State<ProfilePage> {
   }
 
   Widget _buildHistoryButton(String title, String type) {
+    bool isSelected = selectedHistory == type;
     return ElevatedButton(
       onPressed: () {
         setState(() {
@@ -185,34 +229,78 @@ mixin ProfilePageMixin on State<ProfilePage> {
         });
       },
       style: ElevatedButton.styleFrom(
-        foregroundColor:
-            selectedHistory == type ? Colors.purple[800] : Colors.white,
-        backgroundColor:
-            selectedHistory == type ? Colors.white : Colors.purple[400],
+        foregroundColor: isSelected ? Colors.purple[800] : Colors.white,
+        backgroundColor: isSelected ? Colors.white : Colors.purple[600],
+        elevation: isSelected ? 5 : 2,
+        padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
       ),
-      child: Text(title),
+      child: Text(
+        title,
+        style: historyButtonTextStyle.copyWith(
+          color: isSelected ? Colors.purple[800] : Colors.white,
+        ),
+      ),
     );
   }
 
   Widget _buildHistoryDetails() {
-    String historyData = '';
-    if (selectedHistory == 'week') {
-      historyData =
-          'Showing workout history for this week ...............................................................................................................................';
-    } else if (selectedHistory == 'month') {
-      historyData =
-          'Showing workout history for this month...............................................................................................................................';
-    } else if (selectedHistory == 'year') {
-      historyData =
-          'Showing workout history for this year.....................................................................................................................................';
+    String historyData;
+    switch (selectedHistory) {
+      case 'week':
+        historyData = 'You completed 5 workouts this week. Great job!';
+        break;
+      case 'month':
+        historyData = 'You completed 20 workouts this month. Keep it up!';
+        break;
+      case 'year':
+        historyData = 'You completed 200 workouts this year. Amazing progress!';
+        break;
+      default:
+        historyData = 'Select a time frame to view history.';
     }
-    return Text(
-      historyData,
-      style: TextStyle(
-        fontSize: 18.0,
-        fontWeight: FontWeight.w400,
-        color: Colors.white70,
-      ),
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.purple[600]?.withOpacity(0.6),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Text(
+            historyData,
+            style: historyDetailTextStyle,
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+          padding: EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.purple[600]?.withOpacity(0.6),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Text(
+            historyData,
+            style: historyDetailTextStyle,
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+          padding: EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.purple[600]?.withOpacity(0.6),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Text(
+            historyData,
+            style: historyDetailTextStyle,
+          ),
+        ),
+      ],
     );
   }
 
